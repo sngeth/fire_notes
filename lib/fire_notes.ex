@@ -3,16 +3,26 @@ defmodule FireNotes do
   Documentation for FireNotes.
   """
 
-  @doc """
-  Hello world.
+  def add(text) do
+    body = Poison.encode! %{"text" => text}
 
-  ## Examples
+    case HTTPoison.put "#{api_url}/note.json?auth=#{database_secret}", body do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        body
+        |> Poison.decode!
+        |> Map.fetch!("text")
+        |> IO.puts
 
-      iex> FireNotes.hello
-      :world
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        IO.inspect reason
+    end
+  end
 
-  """
-  def hello do
-    :world
+  def api_url do
+    "https://fire-notes-7a80a.firebaseio.com"
+  end
+
+  def database_secret do
+    System.get_env("FIRE_NOTES_SECRET")
   end
 end

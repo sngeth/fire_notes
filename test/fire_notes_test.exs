@@ -1,8 +1,10 @@
 defmodule FireNotesTest do
   use ExUnit.Case
-  doctest FireNotes
+  import ExUnit.CaptureIO
 
-  test "the truth" do
-    assert 1 + 1 == 2
+  test "it can add a note using Firebase API" do
+    assert capture_io(fn ->
+      FireNotes.add "Hello World!"
+    end) == "Hello World!\n"
   end
 end
