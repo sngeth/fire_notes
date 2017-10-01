@@ -6,16 +6,29 @@ defmodule FireNotes do
   def add(text) do
     body = Poison.encode! %{"text" => text}
 
-    case HTTPoison.put "#{api_url}/note.json?auth=#{database_secret}", body do
+    case HTTPoison.post "#{api_url()}/notes.json?auth=#{database_secret()}", body do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        body
-        |> Poison.decode!
-        |> Map.fetch!("text")
-        |> IO.puts
+        body |> Poison.decode!
 
       {:error, %HTTPoison.Error{reason: reason}} ->
         IO.inspect reason
     end
+  end
+
+  def show do
+    case HTTPoison.get "#{api_url()}/notes.json?auth=#{database_secret()}" do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        body
+        |> Poison.decode!
+        |> print_notes()
+
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        IO.inspect reason
+    end
+  end
+
+  def print_notes(res) do
+    for {_, note} <- res, do: IO.puts note["text"]
   end
 
   def api_url do
