@@ -9,6 +9,7 @@ defmodule FireNotes do
     case HTTPoison.post "#{api_url()}/notes.json?auth=#{database_secret()}", body do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         body |> Poison.decode!
+        IO.puts "Your note was saved!"
 
       {:error, %HTTPoison.Error{reason: reason}} ->
         IO.inspect reason
@@ -25,6 +26,10 @@ defmodule FireNotes do
       {:error, %HTTPoison.Error{reason: reason}} ->
         IO.inspect reason
     end
+  end
+
+  def print_notes(nil) do
+    IO.puts "No notes to show"
   end
 
   def print_notes(res) do
